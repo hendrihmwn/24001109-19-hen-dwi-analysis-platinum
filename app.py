@@ -1,10 +1,11 @@
 import pandas as pd
 import clean_helper as c
+import prediction_helper as pr
 import sqlite3
 from flask import Flask, jsonify, request
 from flasgger import Swagger, LazyString, LazyJSONEncoder, swag_from
 
-DB_FILE = 'db/text_clean.db'
+DB_FILE = 'db/sentiment_analysis.db'
 
 app = Flask(__name__)
 
@@ -36,23 +37,30 @@ swagger = Swagger(app, template=swagger_template,
 def hello_world():
     return 'API for Sentiment Analysis'
 
-@swag_from("docs/sentiment_text.yml", methods=['POST'])
-@app.route('/sentiment-text', methods=['POST'])
-def sentiment_text():
+@swag_from("docs/sentiment_text_nnmlp.yml", methods=['POST'])
+@app.route('/sentiment-text-nnmlp', methods=['POST'])
+def sentiment_text_nnmlp():
     # required validation
     if 'text' not in request.form:
         return res('text is required', 400)
     
     text = request.form['text']
+
+    # predict
+    hasil = pr.prediction_by_mlp(text)
+    # save db
+    data = [(text, hasil, "mlp_classifier")]
+    insert_into_texts(data)
     
     return res({
-        "text": text,
-        "sentiment": "negatif"
-        })
+        "input_text": text,
+        "sentiment": hasil,
+        "model_type": "mlp_classifier"
+    })
 
-@swag_from("docs/sentiment_file.yml", methods=['POST'])
-@app.route('/sentiment-file', methods=['POST'])
-def sentiment_file():
+@swag_from("docs/sentiment_file_nnmlp.yml", methods=['POST'])
+@app.route('/sentiment-file-nnmlp', methods=['POST'])
+def sentiment_file_nnmlp():
     # required validation
     if 'file' not in request.files:
         return res('file is required', 400)
@@ -60,17 +68,77 @@ def sentiment_file():
     file = request.files.getlist('file')[0]
     df = pd.read_csv(file)
     texts = df.text.to_list()
-    # read kamus for replacing word
-    kamus = c.kamus_alay()
 
     res_arr = []
+    data_insert = []
     for text in texts:
-        res.append({
-        "text": text,
-        "sentiment": "negatif"
+        # predict
+        hasil = pr.prediction_by_mlp(text)
+        # append array insert
+        data_insert.append((text, hasil, "mlp_classifier"))
+
+        res_arr.append({
+        "input_text": text,
+        "sentiment": hasil,
+        "model_type": "mlp_classifier"
     })
-        
+    
+    # save db
+    insert_into_texts(data_insert)
     return res(res_arr)
+
+@swag_from("docs/sentiment_text_lstm.yml", methods=['POST'])
+@app.route('/sentiment-text-lstm', methods=['POST'])
+def sentiment_text_lstm():
+    # required validation
+    if 'text' not in request.form:
+        return res('text is required', 400)
+    
+    text = request.form['text']
+
+    # predict
+    # PREDISKI LSTM KODING DISIN
+    hasil = ""
+    # save db
+    data = [(text, hasil, "lstm")]
+    insert_into_texts(data)
+    
+    return res({
+        "input_text": text,
+        "sentiment": hasil,
+        "model_type": "lstm"
+    })
+
+@swag_from("docs/sentiment_file_lstm.yml", methods=['POST'])
+@app.route('/sentiment-file-lstm', methods=['POST'])
+def sentiment_file_lstm():
+    # required validation
+    if 'file' not in request.files:
+        return res('file is required', 400)
+    
+    file = request.files.getlist('file')[0]
+    df = pd.read_csv(file)
+    texts = df.text.to_list()
+
+    res_arr = []
+    data_insert = []
+    for text in texts:
+        # predict
+        # predict
+        hasil = pr.prediction_by_mlp(text)
+        # append array insert
+        data_insert.append((text, hasil, "lstm"))
+
+        res_arr.append({
+        "input_text": text,
+        "sentiment": hasil,
+        "model_type": "lstm"
+    })
+    
+    # save db
+    insert_into_texts(data_insert)
+    return res(res_arr)
+
 
 def res(data, code = 200):
     return jsonify({
@@ -81,7 +149,7 @@ def res(data, code = 200):
 def insert_into_texts(data):
     conn = sqlite3.connect(DB_FILE)
     try:
-        conn.cursor().executemany("INSERT INTO texts (text_clean, text_raw) VALUES (?, ?)", data)
+        conn.cursor().executemany("INSERT INTO texts (input_text, sentiment, model_type) VALUES (?, ?, ?)", data)
         conn.commit()
         print ("success insert to texts")
     except sqlite3.Error as e:

@@ -1,16 +1,14 @@
 # Data Cleansing Project
 
-This repository contains the implementation of Data Cleansing API. And also contains the implementation of report analysis abusive word for hate speech tweet.
+This repository contains the implementation of Sentiment Analysis Prediction Using Neural Network MLP Classifier and LSTM.
 
 ## Dependency
 
 This repository requires this following softwares and dependencies to work:
 
 - Python3
-- Matplotlib
 - Pandas
 - Regex Python
-- Seaborn
 - Sqlite3
 - Flask
 - Flassger
@@ -35,19 +33,5 @@ make run
 
 After run, go to `/docs` for see swagger documentation.
 
-### Report Analysis
-
-data preparation:
-
-```sh
-make prepare
-```
-
-data visualization:
-
-```sh
-make report
-```
-
-All generate output will save into output directory. The powerpoint file is on `report analysis.pptx`
+The powerpoint file is on `report analysis.pptx`
 
