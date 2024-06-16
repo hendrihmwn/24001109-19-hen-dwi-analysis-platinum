@@ -5,6 +5,8 @@ import sqlite3
 from flask import Flask, jsonify, request
 from flasgger import Swagger, LazyString, LazyJSONEncoder, swag_from
 
+# import tensorflow as t
+
 DB_FILE = 'db/sentiment_analysis.db'
 
 app = Flask(__name__)
@@ -97,8 +99,7 @@ def sentiment_text_lstm():
     text = request.form['text']
 
     # predict
-    # PREDISKI LSTM KODING DISIN
-    hasil = ""
+    hasil = pr.prediction_by_lstm(text)
     # save db
     data = [(text, hasil, "lstm")]
     insert_into_texts(data)
@@ -124,8 +125,7 @@ def sentiment_file_lstm():
     data_insert = []
     for text in texts:
         # predict
-        # predict
-        hasil = pr.prediction_by_mlp(text)
+        hasil = pr.prediction_by_lstm(text)
         # append array insert
         data_insert.append((text, hasil, "lstm"))
 

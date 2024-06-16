@@ -12,6 +12,8 @@ This repository requires this following softwares and dependencies to work:
 - Sqlite3
 - Flask
 - Flassger
+- Sckit Learn
+- Tensorflow
 - Makefile (not required)
 
 To make work well, install all dependencies first.
