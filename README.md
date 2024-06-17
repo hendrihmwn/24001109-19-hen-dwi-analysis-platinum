@@ -20,6 +20,11 @@ To make work well, install all dependencies first.
 
 ## How to RUN
 
+Before run the API, please download all models resources in this: 
+`https://drive.google.com/drive/folders/1uPxCn53kn8E65FYLRsBPEH-dw9TM5Uyz?usp=sharing`
+
+Put the resources on directory `/modeling`
+
 To run API 
 
 ```sh
@@ -34,5 +39,11 @@ make run
 
 After run, go to `/docs` for see swagger documentation.
 
-The powerpoint file is on `report analysis.pptx`
+## Other Docs
+
+The powerpoint file is on `Analisis sentimen menggunakan neural network dan lstm.pdf`
+
+Spreedsheet for neural network calculation is on `Kalkulasi Neural Network.xlsx`
+
+Docs answer is on `Lembar Jawaban Kalkulasi Neural Network.docx`
 
